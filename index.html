@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <title>Peptid-Kalender</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="title">Peptid-Kalender</h1>
+  </header>
+
+  <main>
+    <!-- Kalender -->
+    <section id="view-calendar" class="view active">
+      <div class="month-nav">
+        <button id="prev-month" class="icon-btn" aria-label="Vorheriger Monat">‹</button>
+        <button id="month-label" class="month-label" title="Zu heute springen"></button>
+        <button id="next-month" class="icon-btn" aria-label="Nächster Monat">›</button>
+      </div>
+      <div class="weekdays">
+        <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+
+      <div class="day-panel">
+        <h2 id="day-title"></h2>
+        <ul id="dose-list" class="dose-list"></ul>
+      </div>
+    </section>
+
+    <!-- Peptide -->
+    <section id="view-peptides" class="view">
+      <div class="section-head">
+        <h2>Meine Peptide</h2>
+        <button id="add-peptide" class="btn primary">+ Peptid</button>
+      </div>
+      <ul id="peptide-list" class="peptide-list"></ul>
+
+      <div class="card">
+        <h3>Daten</h3>
+        <p class="muted">Alle Daten werden nur lokal auf diesem Gerät gespeichert.</p>
+        <div class="row">
+          <button id="export-btn" class="btn">Exportieren</button>
+          <label class="btn">Importieren<input id="import-input" type="file" accept="application/json" hidden></label>
+        </div>
+      </div>
+      <p class="muted small">Hinweis: Diese App ist nur ein Tracking-Werkzeug und ersetzt keine ärztliche Beratung.</p>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="calendar">📅<span>Kalender</span></button>
+    <button class="tab" data-view="peptides">💉<span>Peptide</span></button>
+  </nav>
+
+  <!-- Formular Peptid -->
+  <dialog id="peptide-dialog">
+    <form id="peptide-form" method="dialog">
+      <h2 id="form-title">Peptid hinzufügen</h2>
+
+      <label>Name
+        <input name="name" required placeholder="z. B. BPC-157" autocomplete="off">
+      </label>
+
+      <div class="row">
+        <label class="grow">Dosis
+          <input name="dose" type="number" step="any" min="0" placeholder="250">
+        </label>
+        <label>Einheit
+          <select name="unit">
+            <option>mcg</option><option>mg</option><option>IE</option><option>ml</option><option>Einheiten</option>
+          </select>
+        </label>
+      </div>
+
+      <label>Einnahmerhythmus
+        <select name="scheduleType">
+          <option value="daily">Täglich</option>
+          <option value="interval">Alle X Tage</option>
+          <option value="weekdays">Bestimmte Wochentage</option>
+          <option value="cycle">Zyklus (X Tage an / Y Tage Pause)</option>
+        </select>
+      </label>
+
+      <div class="sched sched-interval">
+        <label>Alle
+          <input name="interval" type="number" min="1" value="2"> Tage
+        </label>
+      </div>
+      <div class="sched sched-weekdays weekday-picker">
+        <label><input type="checkbox" name="wd" value="1">Mo</label>
+        <label><input type="checkbox" name="wd" value="2">Di</label>
+        <label><input type="checkbox" name="wd" value="3">Mi</label>
+        <label><input type="checkbox" name="wd" value="4">Do</label>
+        <label><input type="checkbox" name="wd" value="5">Fr</label>
+        <label><input type="checkbox" name="wd" value="6">Sa</label>
+        <label><input type="checkbox" name="wd" value="0">So</label>
+      </div>
+      <div class="sched sched-cycle row">
+        <label class="grow">Tage an <input name="onDays" type="number" min="1" value="5"></label>
+        <label class="grow">Tage Pause <input name="offDays" type="number" min="0" value="2"></label>
+      </div>
+
+      <fieldset class="times">
+        <legend>Uhrzeiten pro Einnahmetag</legend>
+        <div id="time-list"></div>
+        <button type="button" id="add-time" class="btn small">+ Uhrzeit</button>
+      </fieldset>
+
+      <div class="row">
+        <label class="grow">Start
+          <input name="startDate" type="date" required>
+        </label>
+        <label class="grow">Ende (optional)
+          <input name="endDate" type="date">
+        </label>
+      </div>
+
+      <label>Farbe
+        <input name="color" type="color" value="#0f766e">
+      </label>
+
+      <label>Notizen
+        <textarea name="notes" rows="2" placeholder="z. B. subkutan, Bauch"></textarea>
+      </label>
+
+      <div class="row actions">
+        <button type="button" id="delete-peptide" class="btn danger">Löschen</button>
+        <span class="grow"></span>
+        <button type="button" id="cancel-form" class="btn">Abbrechen</button>
+        <button type="submit" class="btn primary">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
