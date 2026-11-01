@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Einnahme von Peptiden und Supplements im Kalender tracken">
   <meta name="theme-color" content="#0f766e">
   <title>Peptid-Kalender</title>
   <link rel="manifest" href="manifest.webmanifest">
@@ -23,6 +24,7 @@
         <button id="month-label" class="month-label" title="Zu heute springen"></button>
         <button id="next-month" class="icon-btn" aria-label="Nächster Monat">›</button>
       </div>
+      <div id="stock-alerts" class="alerts"></div>
       <div class="weekdays">
         <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
       </div>
@@ -34,17 +36,56 @@
       </div>
     </section>
 
-    <!-- Peptide -->
-    <section id="view-peptides" class="view">
+    <!-- Peptide / Supplements -->
+    <section id="view-peptide" class="view" data-category="peptide">
       <div class="section-head">
         <h2>Meine Peptide</h2>
-        <button id="add-peptide" class="btn primary">+ Peptid</button>
+        <button class="btn primary" data-action="add">+ Peptid</button>
       </div>
-      <ul id="peptide-list" class="peptide-list"></ul>
+      <ul class="item-list"></ul>
+    </section>
+
+    <section id="view-supplement" class="view" data-category="supplement">
+      <div class="section-head">
+        <h2>Meine Supplements</h2>
+        <button class="btn primary" data-action="add">+ Supplement</button>
+      </div>
+      <ul class="item-list"></ul>
+    </section>
+
+    <!-- Einstellungen -->
+    <section id="view-settings" class="view">
+      <div class="section-head"><h2>Einstellungen</h2></div>
+
+      <div class="card">
+        <h3>Sync zwischen Geräten</h3>
+        <div id="sync-off">
+          <p class="muted">Deine Daten werden Ende-zu-Ende-verschlüsselt über einen Sync-Server abgeglichen.
+            Der Server kann die Inhalte nicht lesen. Alle Geräte brauchen denselben Sync-Schlüssel.</p>
+          <label class="field">Server-Adresse
+            <input id="sync-server" type="url" placeholder="https://mein-server.de" autocomplete="off">
+          </label>
+          <div class="row">
+            <button id="sync-create" class="btn primary">Neuen Sync starten</button>
+            <button id="sync-join" class="btn">Mit Schlüssel verbinden</button>
+          </div>
+        </div>
+        <div id="sync-on" hidden>
+          <p class="muted">Sync-Schlüssel – auf dem anderen Gerät unter „Mit Schlüssel verbinden“ eingeben:</p>
+          <div class="key-box"><code id="sync-key"></code><button id="sync-copy" class="btn small">Kopieren</button></div>
+          <p class="muted small">Server: <span id="sync-server-label"></span></p>
+          <p id="sync-status" class="sync-status"></p>
+          <div class="row">
+            <button id="sync-now" class="btn primary">Jetzt synchronisieren</button>
+            <button id="sync-disconnect" class="btn danger">Trennen</button>
+          </div>
+          <p class="muted small">Bewahre den Schlüssel sicher auf – wer ihn kennt, kann deine Daten lesen.</p>
+        </div>
+      </div>
 
       <div class="card">
         <h3>Daten</h3>
-        <p class="muted">Alle Daten werden nur lokal auf diesem Gerät gespeichert.</p>
+        <p class="muted">Ohne Sync werden alle Daten nur lokal auf diesem Gerät gespeichert.</p>
         <div class="row">
           <button id="export-btn" class="btn">Exportieren</button>
           <label class="btn">Importieren<input id="import-input" type="file" accept="application/json" hidden></label>
@@ -56,16 +97,18 @@
 
   <nav class="tabbar">
     <button class="tab active" data-view="calendar">📅<span>Kalender</span></button>
-    <button class="tab" data-view="peptides">💉<span>Peptide</span></button>
+    <button class="tab" data-view="peptide">💉<span>Peptide</span></button>
+    <button class="tab" data-view="supplement">💊<span>Supplements</span></button>
+    <button class="tab" data-view="settings">⚙️<span>Einstellungen</span></button>
   </nav>
 
-  <!-- Formular Peptid -->
-  <dialog id="peptide-dialog">
-    <form id="peptide-form" method="dialog">
-      <h2 id="form-title">Peptid hinzufügen</h2>
+  <!-- Formular Peptid / Supplement -->
+  <dialog id="item-dialog">
+    <form id="item-form" method="dialog">
+      <h2 id="form-title">Hinzufügen</h2>
 
       <label>Name
-        <input name="name" required placeholder="z. B. BPC-157" autocomplete="off">
+        <input name="name" required  autocomplete="off">
       </label>
 
       <div class="row">
@@ -73,9 +116,7 @@
           <input name="dose" type="number" step="any" min="0" placeholder="250">
         </label>
         <label>Einheit
-          <select name="unit">
-            <option>mcg</option><option>mg</option><option>IE</option><option>ml</option><option>Einheiten</option>
-          </select>
+          <select name="unit"></select>
         </label>
       </div>
 
@@ -122,16 +163,50 @@
         </label>
       </div>
 
+      <fieldset class="group">
+        <legend>Vorrat</legend>
+        <div class="row">
+          <label class="grow">Aktueller Vorrat
+            <input name="stock" type="number" step="any" min="0" placeholder="leer = nicht verfolgen">
+          </label>
+          <label>Einheit
+            <select name="stockUnit"></select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="grow">Packungsgröße
+            <input name="pack" type="number" step="any" min="0" placeholder="z. B. 5 (mg) oder 60 (Kapseln)">
+          </label>
+          <label class="grow">Warnen ab
+            <span class="inline"><input name="warnDays" type="number" min="0" value="7"> Tagen</span>
+          </label>
+        </div>
+        <p class="muted small">Jede abgehakte Einnahme wird automatisch vom Vorrat abgezogen.</p>
+      </fieldset>
+
+      <fieldset class="group recon-fields">
+        <legend>Rekonstitution (optional)</legend>
+        <div class="row">
+          <label class="grow">Wirkstoff pro Fläschchen (mg)
+            <input name="vialMg" type="number" step="any" min="0" placeholder="z. B. 5">
+          </label>
+          <label class="grow">Wasser (ml)
+            <input name="waterMl" type="number" step="any" min="0" placeholder="z. B. 2">
+          </label>
+        </div>
+        <p id="recon-result" class="recon-result"></p>
+      </fieldset>
+
       <label>Farbe
         <input name="color" type="color" value="#0f766e">
       </label>
 
       <label>Notizen
-        <textarea name="notes" rows="2" placeholder="z. B. subkutan, Bauch"></textarea>
+        <textarea name="notes" rows="2" ></textarea>
       </label>
 
       <div class="row actions">
-        <button type="button" id="delete-peptide" class="btn danger">Löschen</button>
+        <button type="button" id="delete-item" class="btn danger">Löschen</button>
         <span class="grow"></span>
         <button type="button" id="cancel-form" class="btn">Abbrechen</button>
         <button type="submit" class="btn primary">Speichern</button>

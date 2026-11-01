@@ -30,7 +30,7 @@ export function weekdayOf(iso) {
  *  - cycle:    `onDays` days on, then `offDays` days off, repeating
  */
 export function isDue(peptide, iso) {
-  if (!peptide || peptide.paused) return false;
+  if (!peptide || peptide.paused || peptide.deleted) return false;
   const day = dayNumber(iso);
   const start = dayNumber(peptide.startDate);
   if (day < start) return false;
