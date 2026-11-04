@@ -53,6 +53,100 @@
       <ul class="item-list"></ul>
     </section>
 
+    <!-- Rechner -->
+    <section id="view-calc" class="view">
+      <div class="section-head"><h2>Dosis-Rechner</h2></div>
+      <p class="muted small calc-intro">Berechnet, wie viel du nach dem Auflösen (Rekonstitution) aufziehen musst.</p>
+
+      <div class="segmented" id="calc-mode" role="group" aria-label="Art der Anwendung">
+        <button data-mode="syringe">💉 Spritze</button>
+        <button data-mode="pen">🖊️ Pen</button>
+        <button data-mode="spray">👃 Spray</button>
+        <button data-mode="blend">🧪 Blend</button>
+      </div>
+
+      <form id="calc-form" class="calc-form" autocomplete="off" onsubmit="return false">
+        <label class="field">Aus meinen Peptiden laden
+          <select id="calc-source"></select>
+        </label>
+
+        <div class="calc-step calc-only-blend">
+          <h3>Bestandteile des Blends</h3>
+          <div id="blend-rows" class="blend-rows"></div>
+          <button type="button" id="blend-add" class="btn small">+ Bestandteil</button>
+        </div>
+
+        <div class="calc-step calc-not-blend">
+          <h3>Ich möchte berechnen</h3>
+          <div class="segmented small" id="calc-solve">
+            <button type="button" data-solve="units">Aufzuziehende Menge</button>
+            <button type="button" data-solve="water">Benötigtes Wasser</button>
+          </div>
+        </div>
+
+        <div class="calc-step calc-not-blend">
+          <h3><span class="step-no">1</span> Wirkstoff im Fläschchen</h3>
+          <div class="row">
+            <input name="vialAmount" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Wirkstoffmenge">
+            <select name="vialUnit" aria-label="Einheit"><option>mg</option><option>IE</option></select>
+          </div>
+          <div class="pills" data-pills="vialAmount"></div>
+        </div>
+
+        <div class="calc-step">
+          <h3><span class="step-no">2</span> Gewünschte Dosis</h3>
+          <div class="row">
+            <input name="dose" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Dosis">
+            <select name="doseUnit" aria-label="Einheit"><option>mcg</option><option>mg</option><option>IE</option></select>
+          </div>
+          <label class="field calc-only-blend">Dosis bezieht sich auf
+            <select name="anchor"></select>
+          </label>
+        </div>
+
+        <div class="calc-step calc-water">
+          <h3><span class="step-no">3</span> Bakteriostatisches Wasser</h3>
+          <div class="row">
+            <input name="waterMl" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Wasser in ml">
+            <span class="unit-label">ml</span>
+          </div>
+          <div class="pills" data-pills="waterMl"></div>
+        </div>
+
+        <div class="calc-step calc-target">
+          <h3><span class="step-no">3</span> Gewünschte Einheiten pro Dosis</h3>
+          <div class="row">
+            <input name="targetUnits" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Einheiten">
+            <span class="unit-label">Einheiten</span>
+          </div>
+          <div class="pills" data-pills="targetUnits"></div>
+        </div>
+
+        <div class="calc-step calc-only-syringe">
+          <h3><span class="step-no">4</span> Spritze</h3>
+          <div class="segmented small" id="calc-syringe-type">
+            <button type="button" data-upm="100">U-100</button>
+            <button type="button" data-upm="40">U-40</button>
+          </div>
+          <div class="pills" data-pills="syringeMl"></div>
+        </div>
+
+        <div class="calc-step calc-only-spray">
+          <h3><span class="step-no">4</span> Volumen pro Sprühstoß</h3>
+          <div class="row">
+            <input name="sprayMl" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="ml pro Sprühstoß">
+            <span class="unit-label">ml</span>
+          </div>
+          <div class="pills" data-pills="sprayMl"></div>
+        </div>
+      </form>
+
+      <div id="calc-result" class="calc-result" aria-live="polite"></div>
+
+      <p class="muted small">Angelehnt an den <a href="https://peptidelove.github.io" target="_blank" rel="noopener">Peptide Dose Calculator</a>.
+        Alle Angaben ohne Gewähr – Ergebnisse immer selbst gegenprüfen. Kein Ersatz für ärztliche Beratung.</p>
+    </section>
+
     <!-- Einstellungen -->
     <section id="view-settings" class="view">
       <div class="section-head"><h2>Einstellungen</h2></div>
@@ -99,6 +193,7 @@
     <button class="tab active" data-view="calendar">📅<span>Kalender</span></button>
     <button class="tab" data-view="peptide">💉<span>Peptide</span></button>
     <button class="tab" data-view="supplement">💊<span>Supplements</span></button>
+    <button class="tab" data-view="calc">🧮<span>Rechner</span></button>
     <button class="tab" data-view="settings">⚙️<span>Einstellungen</span></button>
   </nav>
 

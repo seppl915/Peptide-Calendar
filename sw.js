@@ -1,6 +1,6 @@
 // Offline-Cache: App-Dateien werden gecacht, Updates werden im Hintergrund geladen.
-const CACHE = 'peptide-calendar-v2';
-const ASSETS = ['./', 'index.html', 'styles.css', 'js/app.js', 'js/schedule.js', 'js/storage.js', 'js/inventory.js', 'js/merge.js', 'js/sync.js', 'manifest.webmanifest', 'icon.svg'];
+const CACHE = 'peptide-calendar-v3';
+const ASSETS = ['./', 'index.html', 'styles.css', 'js/app.js', 'js/schedule.js', 'js/storage.js', 'js/inventory.js', 'js/merge.js', 'js/sync.js', 'js/calculator.js', 'js/calc-ui.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));

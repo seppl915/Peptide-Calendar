@@ -3,6 +3,7 @@ import { load, save, validateImport, loadSyncConfig, saveSyncConfig } from './st
 import { convert, hasStock, remaining, forecast, reconstitution } from './inventory.js';
 import { generateKey, isValidKey, syncOnce } from './sync.js';
 import { mergeStates, sameState } from './merge.js';
+import { initCalculator } from './calc-ui.js';
 
 const CATEGORIES = {
   peptide: {
@@ -285,7 +286,7 @@ function updateFormState() {
 const PALETTE = ['#0f766e', '#2563eb', '#9333ea', '#db2777', '#ea580c', '#ca8a04', '#16a34a', '#0891b2'];
 const nextColor = () => PALETTE[activeItems().length % PALETTE.length];
 
-function openForm(cat = 'peptide', p = null) {
+function openForm(cat = 'peptide', p = null, prefill = null) {
   const c = CATEGORIES[cat];
   editing = { id: p?.id || null, category: cat };
   form.reset();
@@ -319,6 +320,14 @@ function openForm(cat = 'peptide', p = null) {
   form.warnDays.value = p?.stock?.warnDays ?? 7;
   form.vialMg.value = p?.recon?.vialMg ?? '';
   form.waterMl.value = p?.recon?.waterMl ?? '';
+
+  // Vorbelegung, z. B. aus dem Rechner
+  if (prefill) {
+    if (prefill.dose != null) form.dose.value = prefill.dose;
+    if (prefill.unit) { fillSelect(form.unit, c.units, prefill.unit); if (!form.stock.value) form.stockUnit.value = prefill.unit; }
+    if (prefill.vialMg != null) form.vialMg.value = prefill.vialMg;
+    if (prefill.waterMl != null) form.waterMl.value = prefill.waterMl;
+  }
 
   updateFormState();
   dialog.showModal();
@@ -555,7 +564,13 @@ $('#month-label').addEventListener('click', () => {
   render();
 });
 
+const calculator = initCalculator({
+  getPeptides: () => activeItems().filter((i) => (i.category || 'peptide') === 'peptide'),
+  openPeptideForm: (item, prefill) => { switchView('peptide'); openForm('peptide', item, prefill); },
+});
+
 function render() {
+  calculator.render();
   renderAlerts();
   renderCalendar();
   renderDay();

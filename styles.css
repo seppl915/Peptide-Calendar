@@ -158,3 +158,55 @@ form input[type=color] { width: 56px; height: 36px; border: 1px solid var(--bord
 .row.center { justify-content: center; }
 .tab { font-size: 1.1rem; }
 .tab span { font-size: .7rem; }
+
+/* Rechner */
+.calc-intro { margin: -6px 0 12px; }
+.segmented { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3px; gap: 3px; }
+.segmented button { flex: 1; border: 0; background: none; padding: 8px 4px; border-radius: 9px; cursor: pointer; font-size: .9rem; color: var(--muted); white-space: nowrap; }
+.segmented button.active { background: var(--primary); color: var(--primary-text); font-weight: 600; }
+.segmented.small button { font-size: .82rem; padding: 6px 4px; }
+.calc-form { padding: 0; margin-top: 12px; gap: 10px; }
+.calc-step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.calc-step h3 { font-size: .95rem; display: flex; align-items: center; gap: 8px; }
+.step-no:not(:empty) { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--primary-text); font-size: .75rem; }
+.calc-step .row { align-items: center; flex-wrap: nowrap; }
+.calc-step input, .calc-step select, .calc-form > .field select {
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: var(--bg); min-width: 0;
+}
+.calc-step select { width: auto; }
+.calc-form > .field { margin: 0; }
+.unit-label { color: var(--muted); font-size: .9rem; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { border: 1px solid var(--border); background: var(--bg); border-radius: 999px; padding: 5px 11px; font-size: .85rem; cursor: pointer; }
+.pill.active { background: var(--primary); border-color: var(--primary); color: var(--primary-text); font-weight: 600; }
+.blend-rows { display: flex; flex-direction: column; gap: 6px; }
+.blend-row { display: flex; gap: 6px; align-items: center; }
+.blend-row input[data-blend="mg"] { flex: 0 0 76px; }
+.blend-row input[data-blend="name"] { flex: 1 1 0; }
+.calc-step > .btn { align-self: flex-start; }
+
+.calc-result {
+  margin: 14px 0; background: var(--surface); border: 2px solid var(--primary); border-radius: 16px; padding: 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.calc-result.pending { border-style: dashed; border-color: var(--border); color: var(--muted); text-align: center; }
+.result-head { text-align: center; }
+.result-head .big { font-size: 2rem; font-weight: 800; color: var(--primary); line-height: 1.15; }
+.calc-note { margin: 0; padding: 8px 10px; border-radius: 8px; font-size: .88rem; background: color-mix(in srgb, var(--warn) 15%, var(--surface)); }
+.result-details { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: .92rem; }
+.result-details li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.result-details li.sub { padding-left: 12px; color: var(--muted); }
+.calc-result > .btn { align-self: center; }
+.spray-icons { text-align: center; font-size: 1.5rem; letter-spacing: 4px; }
+.syringe { width: 100%; height: auto; }
+.syringe .barrel { fill: var(--bg); stroke: var(--muted); stroke-width: 1.5; }
+.syringe .liquid { fill: color-mix(in srgb, var(--primary) 55%, transparent); }
+.syringe .tick { stroke: var(--text); stroke-width: 1; }
+.syringe .tick-label { fill: var(--muted); font-size: 9px; text-anchor: middle; }
+.syringe .needle { stroke: var(--muted); stroke-width: 2; }
+.syringe .hub, .syringe .rod { fill: var(--muted); }
+.syringe .plunger { fill: var(--text); }
+.tab { font-size: 1rem; padding: 8px 0 10px; }
+.tab span { font-size: .64rem; }
+
+a { color: var(--primary); }

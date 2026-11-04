@@ -18,6 +18,12 @@ mit Vorratsberechnung und verschlüsseltem Sync zwischen mehreren Geräten.
   - „Nachfüllen“ mit einem Tipp (Packungsgröße wird vorgeschlagen)
   - mg/mcg/g werden automatisch umgerechnet (z. B. Vorrat 5 mg, Dosis 250 mcg)
   - **Rekonstitutions-Rechner** für Peptide: mg pro Fläschchen + ml Wasser → ml bzw. Einheiten auf der U-100-Spritze
+- **Dosis-Rechner** (Tab „Rechner“), angelehnt an den [Peptide Dose Calculator](https://peptidelove.github.io):
+  - Modi: Spritze (U-100/U-40, 0,3/0,5/1 ml), Pen, Nasenspray, Blend aus mehreren Peptiden
+  - berechnet die aufzuziehenden Einheiten/ml – oder umgekehrt die nötige Wassermenge für eine gewünschte Einheitenzahl
+  - zeigt Konzentration, Wirkstoff pro Teilstrich, Dosen pro Fläschchen und eine Spritzen-Grafik
+  - warnt, wenn die Menge nicht in die Spritze passt oder zu klein zum Ablesen ist
+  - Werte lassen sich aus eigenen Peptiden laden und mit einem Tipp ins Peptid übernehmen
 - **Sync zwischen Geräten** – Ende-zu-Ende-verschlüsselt (siehe unten)
 - **Export/Import** als JSON, **offline** nutzbar, Hell-/Dunkelmodus
 
@@ -73,16 +79,17 @@ oder Railway stellen. Die Web-Crypto-API des Browsers funktioniert nur über HTT
 npm test
 ```
 
-Getestet werden Termin-Logik, Vorratsberechnung, Zusammenführen der Daten sowie Sync-Client und -Server.
+Getestet werden Termin-Logik, Vorratsberechnung, Dosis-Rechner, Zusammenführen der Daten sowie Sync-Client und -Server.
 
 ## Struktur
 
 | Datei | Zweck |
 | --- | --- |
-| `index.html`, `styles.css` | Oberfläche (Kalender, Peptide, Supplements, Einstellungen) |
+| `index.html`, `styles.css` | Oberfläche (Kalender, Peptide, Supplements, Rechner, Einstellungen) |
 | `js/app.js` | UI-Logik |
 | `js/schedule.js` | Wann ist eine Einnahme fällig? |
 | `js/inventory.js` | Vorrat, Reichweite, Rekonstitution |
+| `js/calculator.js`, `js/calc-ui.js` | Dosis-Rechner (Logik / Oberfläche) |
 | `js/merge.js` | Zusammenführen von Datenständen |
 | `js/sync.js` | Verschlüsselung und Sync-Client |
 | `js/storage.js` | Speichern in `localStorage` (inkl. Migration älterer Daten) |
