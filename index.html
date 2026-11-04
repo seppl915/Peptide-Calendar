@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Einnahme von Peptiden und Supplements im Kalender tracken">
+  <meta name="theme-color" content="#0f766e">
+  <title>Peptid-Kalender</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="title">Peptid-Kalender</h1>
+  </header>
+
+  <main>
+    <!-- Kalender -->
+    <section id="view-calendar" class="view active">
+      <div class="month-nav">
+        <button id="prev-month" class="icon-btn" aria-label="Vorheriger Monat">‹</button>
+        <button id="month-label" class="month-label" title="Zu heute springen"></button>
+        <button id="next-month" class="icon-btn" aria-label="Nächster Monat">›</button>
+      </div>
+      <div id="stock-alerts" class="alerts"></div>
+      <div class="weekdays">
+        <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+
+      <div class="day-panel">
+        <h2 id="day-title"></h2>
+        <ul id="dose-list" class="dose-list"></ul>
+      </div>
+    </section>
+
+    <!-- Peptide / Supplements -->
+    <section id="view-peptide" class="view" data-category="peptide">
+      <div class="section-head">
+        <h2>Meine Peptide</h2>
+        <button class="btn primary" data-action="add">+ Peptid</button>
+      </div>
+      <ul class="item-list"></ul>
+    </section>
+
+    <section id="view-supplement" class="view" data-category="supplement">
+      <div class="section-head">
+        <h2>Meine Supplements</h2>
+        <button class="btn primary" data-action="add">+ Supplement</button>
+      </div>
+      <ul class="item-list"></ul>
+    </section>
+
+    <!-- Rechner -->
+    <section id="view-calc" class="view">
+      <div class="section-head"><h2>Dosis-Rechner</h2></div>
+      <p class="muted small calc-intro">Berechnet, wie viel du nach dem Auflösen (Rekonstitution) aufziehen musst.</p>
+
+      <div class="segmented" id="calc-mode" role="group" aria-label="Art der Anwendung">
+        <button data-mode="syringe">💉 Spritze</button>
+        <button data-mode="pen">🖊️ Pen</button>
+        <button data-mode="spray">👃 Spray</button>
+        <button data-mode="blend">🧪 Blend</button>
+      </div>
+
+      <form id="calc-form" class="calc-form" autocomplete="off" onsubmit="return false">
+        <label class="field">Aus meinen Peptiden laden
+          <select id="calc-source"></select>
+        </label>
+
+        <div class="calc-step calc-only-blend">
+          <h3>Bestandteile des Blends</h3>
+          <div id="blend-rows" class="blend-rows"></div>
+          <button type="button" id="blend-add" class="btn small">+ Bestandteil</button>
+        </div>
+
+        <div class="calc-step calc-not-blend">
+          <h3>Ich möchte berechnen</h3>
+          <div class="segmented small" id="calc-solve">
+            <button type="button" data-solve="units">Aufzuziehende Menge</button>
+            <button type="button" data-solve="water">Benötigtes Wasser</button>
+          </div>
+        </div>
+
+        <div class="calc-step calc-not-blend">
+          <h3><span class="step-no">1</span> Wirkstoff im Fläschchen</h3>
+          <div class="row">
+            <input name="vialAmount" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Wirkstoffmenge">
+            <select name="vialUnit" aria-label="Einheit"><option>mg</option><option>IE</option></select>
+          </div>
+          <div class="pills" data-pills="vialAmount"></div>
+        </div>
+
+        <div class="calc-step">
+          <h3><span class="step-no">2</span> Gewünschte Dosis</h3>
+          <div class="row">
+            <input name="dose" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Dosis">
+            <select name="doseUnit" aria-label="Einheit"><option>mcg</option><option>mg</option><option>IE</option></select>
+          </div>
+          <label class="field calc-only-blend">Dosis bezieht sich auf
+            <select name="anchor"></select>
+          </label>
+        </div>
+
+        <div class="calc-step calc-water">
+          <h3><span class="step-no">3</span> Bakteriostatisches Wasser</h3>
+          <div class="row">
+            <input name="waterMl" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Wasser in ml">
+            <span class="unit-label">ml</span>
+          </div>
+          <div class="pills" data-pills="waterMl"></div>
+        </div>
+
+        <div class="calc-step calc-target">
+          <h3><span class="step-no">3</span> Gewünschte Einheiten pro Dosis</h3>
+          <div class="row">
+            <input name="targetUnits" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="Einheiten">
+            <span class="unit-label">Einheiten</span>
+          </div>
+          <div class="pills" data-pills="targetUnits"></div>
+        </div>
+
+        <div class="calc-step calc-only-syringe">
+          <h3><span class="step-no">4</span> Spritze</h3>
+          <div class="segmented small" id="calc-syringe-type">
+            <button type="button" data-upm="100">U-100</button>
+            <button type="button" data-upm="40">U-40</button>
+          </div>
+          <div class="pills" data-pills="syringeMl"></div>
+        </div>
+
+        <div class="calc-step calc-only-spray">
+          <h3><span class="step-no">4</span> Volumen pro Sprühstoß</h3>
+          <div class="row">
+            <input name="sprayMl" type="number" step="any" min="0" inputmode="decimal" class="grow" aria-label="ml pro Sprühstoß">
+            <span class="unit-label">ml</span>
+          </div>
+          <div class="pills" data-pills="sprayMl"></div>
+        </div>
+      </form>
+
+      <div id="calc-result" class="calc-result" aria-live="polite"></div>
+
+      <p class="muted small">Angelehnt an den <a href="https://peptidelove.github.io" target="_blank" rel="noopener">Peptide Dose Calculator</a>.
+        Alle Angaben ohne Gewähr – Ergebnisse immer selbst gegenprüfen. Kein Ersatz für ärztliche Beratung.</p>
+    </section>
+
+    <!-- Einstellungen -->
+    <section id="view-settings" class="view">
+      <div class="section-head"><h2>Einstellungen</h2></div>
+
+      <div class="card">
+        <h3>Sync zwischen Geräten</h3>
+        <div id="sync-off">
+          <p class="muted">Deine Daten werden Ende-zu-Ende-verschlüsselt über einen Sync-Server abgeglichen.
+            Der Server kann die Inhalte nicht lesen. Alle Geräte brauchen denselben Sync-Schlüssel.</p>
+          <label class="field">Server-Adresse
+            <input id="sync-server" type="url" placeholder="https://mein-server.de" autocomplete="off">
+          </label>
+          <div class="row">
+            <button id="sync-create" class="btn primary">Neuen Sync starten</button>
+            <button id="sync-join" class="btn">Mit Schlüssel verbinden</button>
+          </div>
+        </div>
+        <div id="sync-on" hidden>
+          <p class="muted">Sync-Schlüssel – auf dem anderen Gerät unter „Mit Schlüssel verbinden“ eingeben:</p>
+          <div class="key-box"><code id="sync-key"></code><button id="sync-copy" class="btn small">Kopieren</button></div>
+          <p class="muted small">Server: <span id="sync-server-label"></span></p>
+          <p id="sync-status" class="sync-status"></p>
+          <div class="row">
+            <button id="sync-now" class="btn primary">Jetzt synchronisieren</button>
+            <button id="sync-disconnect" class="btn danger">Trennen</button>
+          </div>
+          <p class="muted small">Bewahre den Schlüssel sicher auf – wer ihn kennt, kann deine Daten lesen.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Daten</h3>
+        <p class="muted">Ohne Sync werden alle Daten nur lokal auf diesem Gerät gespeichert.</p>
+        <div class="row">
+          <button id="export-btn" class="btn">Exportieren</button>
+          <label class="btn">Importieren<input id="import-input" type="file" accept="application/json" hidden></label>
+        </div>
+      </div>
+      <p class="muted small">Hinweis: Diese App ist nur ein Tracking-Werkzeug und ersetzt keine ärztliche Beratung.</p>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="calendar">📅<span>Kalender</span></button>
+    <button class="tab" data-view="peptide">💉<span>Peptide</span></button>
+    <button class="tab" data-view="supplement">💊<span>Supplements</span></button>
+    <button class="tab" data-view="calc">🧮<span>Rechner</span></button>
+    <button class="tab" data-view="settings">⚙️<span>Einstellungen</span></button>
+  </nav>
+
+  <!-- Formular Peptid / Supplement -->
+  <dialog id="item-dialog">
+    <form id="item-form" method="dialog">
+      <h2 id="form-title">Hinzufügen</h2>
+
+      <label>Name
+        <input name="name" required  autocomplete="off">
+      </label>
+
+      <div class="row">
+        <label class="grow">Dosis
+          <input name="dose" type="number" step="any" min="0" placeholder="250">
+        </label>
+        <label>Einheit
+          <select name="unit"></select>
+        </label>
+      </div>
+
+      <label>Einnahmerhythmus
+        <select name="scheduleType">
+          <option value="daily">Täglich</option>
+          <option value="interval">Alle X Tage</option>
+          <option value="weekdays">Bestimmte Wochentage</option>
+          <option value="cycle">Zyklus (X Tage an / Y Tage Pause)</option>
+        </select>
+      </label>
+
+      <div class="sched sched-interval">
+        <label>Alle
+          <input name="interval" type="number" min="1" value="2"> Tage
+        </label>
+      </div>
+      <div class="sched sched-weekdays weekday-picker">
+        <label><input type="checkbox" name="wd" value="1">Mo</label>
+        <label><input type="checkbox" name="wd" value="2">Di</label>
+        <label><input type="checkbox" name="wd" value="3">Mi</label>
+        <label><input type="checkbox" name="wd" value="4">Do</label>
+        <label><input type="checkbox" name="wd" value="5">Fr</label>
+        <label><input type="checkbox" name="wd" value="6">Sa</label>
+        <label><input type="checkbox" name="wd" value="0">So</label>
+      </div>
+      <div class="sched sched-cycle row">
+        <label class="grow">Tage an <input name="onDays" type="number" min="1" value="5"></label>
+        <label class="grow">Tage Pause <input name="offDays" type="number" min="0" value="2"></label>
+      </div>
+
+      <fieldset class="times">
+        <legend>Uhrzeiten pro Einnahmetag</legend>
+        <div id="time-list"></div>
+        <button type="button" id="add-time" class="btn small">+ Uhrzeit</button>
+      </fieldset>
+
+      <div class="row">
+        <label class="grow">Start
+          <input name="startDate" type="date" required>
+        </label>
+        <label class="grow">Ende (optional)
+          <input name="endDate" type="date">
+        </label>
+      </div>
+
+      <fieldset class="group">
+        <legend>Vorrat</legend>
+        <div class="row">
+          <label class="grow">Aktueller Vorrat
+            <input name="stock" type="number" step="any" min="0" placeholder="leer = nicht verfolgen">
+          </label>
+          <label>Einheit
+            <select name="stockUnit"></select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="grow">Packungsgröße
+            <input name="pack" type="number" step="any" min="0" placeholder="z. B. 5 (mg) oder 60 (Kapseln)">
+          </label>
+          <label class="grow">Warnen ab
+            <span class="inline"><input name="warnDays" type="number" min="0" value="7"> Tagen</span>
+          </label>
+        </div>
+        <p class="muted small">Jede abgehakte Einnahme wird automatisch vom Vorrat abgezogen.</p>
+      </fieldset>
+
+      <fieldset class="group recon-fields">
+        <legend>Rekonstitution (optional)</legend>
+        <div class="row">
+          <label class="grow">Wirkstoff pro Fläschchen (mg)
+            <input name="vialMg" type="number" step="any" min="0" placeholder="z. B. 5">
+          </label>
+          <label class="grow">Wasser (ml)
+            <input name="waterMl" type="number" step="any" min="0" placeholder="z. B. 2">
+          </label>
+        </div>
+        <p id="recon-result" class="recon-result"></p>
+      </fieldset>
+
+      <label>Farbe
+        <input name="color" type="color" value="#0f766e">
+      </label>
+
+      <label>Notizen
+        <textarea name="notes" rows="2" ></textarea>
+      </label>
+
+      <div class="row actions">
+        <button type="button" id="delete-item" class="btn danger">Löschen</button>
+        <span class="grow"></span>
+        <button type="button" id="cancel-form" class="btn">Abbrechen</button>
+        <button type="submit" class="btn primary">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
